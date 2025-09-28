@@ -24,8 +24,9 @@ def create_app():
     # Import blueprints
     from app.student.routes import student_bp
     from app.lecturer.routes import lecturer_bp
+    from app.main.routes import main_bp
     
-
+    app.register_blueprint(main_bp, url_prefix="/")
     app.register_blueprint(student_bp, url_prefix="/student")
     app.register_blueprint(lecturer_bp, url_prefix="/lecturer")
 

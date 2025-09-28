@@ -1,7 +1,7 @@
 import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity,set_access_cookies, set_refresh_cookies
 from app.extensions import db
 from app.models import User, Attendance, Grade, VALID_LECTURER_IDS
 
@@ -44,22 +44,18 @@ def login():
 
         lecturer = User.query.filter_by(user_id=lecturer_id, role="lecturer").first()
         if lecturer and check_password_hash(lecturer.password, password):
-            # Use JSON-string identity
             identity_str = json.dumps({"id": lecturer.id, "role": lecturer.role})
             access_token = create_access_token(identity=identity_str)
             refresh_token = create_refresh_token(identity=identity_str)
 
-            # Set tokens in cookies
             resp = make_response(redirect(url_for('lecturer.dashboard')))
-            resp.set_cookie("access_token_cookie", access_token)
-            resp.set_cookie("refresh_token_cookie", refresh_token)
+            set_access_cookies(resp, access_token)
+            set_refresh_cookies(resp, refresh_token)
             flash("Login successful!")
             return resp
 
         flash("Invalid login credentials!")
     return render_template("lecturer/login.html")
-
-
 # ---------- Logout ----------
 @lecturer_bp.route("/logout")
 def logout():
@@ -74,10 +70,18 @@ def logout():
 @lecturer_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh():
+    # Get identity from refresh token
     identity_str = get_jwt_identity()
+    
+    # Create new access token
     access_token = create_access_token(identity=identity_str)
+    
+    # Create response
     resp = make_response({"msg": "Access token refreshed"})
-    resp.set_cookie("access_token_cookie", access_token)
+    
+    # Set access token in cookie
+    set_access_cookies(resp, access_token)
+    
     return resp
 
 

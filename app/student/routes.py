@@ -46,21 +46,18 @@ def login():
 
         student = User.query.filter_by(user_id=student_id, role="student").first()
         if student and check_password_hash(student.password, password):
-            # JSON-string identity for JWT
             identity_str = json.dumps({"id": student.id, "role": student.role})
             access_token = create_access_token(identity=identity_str)
             refresh_token = create_refresh_token(identity=identity_str)
 
-            # Set tokens in cookies
             resp = make_response(redirect(url_for('student.dashboard')))
-            resp.set_cookie("access_token_cookie", access_token)
-            resp.set_cookie("refresh_token_cookie", refresh_token)
+            set_access_cookies(resp, access_token)
+            set_refresh_cookies(resp, refresh_token)
             flash("Login successful!")
             return resp
 
         flash("Invalid login credentials!")
     return render_template("student/login.html")
-
 
 # ---------- Logout ----------
 @student_bp.route("/logout")
@@ -76,12 +73,19 @@ def logout():
 @student_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh():
+    # Get identity from refresh token
     identity_str = get_jwt_identity()
+    
+    # Create new access token
     access_token = create_access_token(identity=identity_str)
+    
+    # Create response
     resp = make_response({"msg": "Access token refreshed"})
-    resp.set_cookie("access_token_cookie", access_token)
+    
+    # Set access token in cookie
+    set_access_cookies(resp, access_token)
+    
     return resp
-
 
 # ---------- Dashboard: View Attendance and Grades ----------
 @student_bp.route("/dashboard")
