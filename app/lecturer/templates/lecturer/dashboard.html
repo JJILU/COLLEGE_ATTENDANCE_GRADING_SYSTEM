@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Lecturer Dashboard{% endblock %}
+{% block content %}
+<h2>Lecturer Dashboard</h2>
+<p>Manage attendance and grades for your students.</p>
+<hr>
+
+<h4>Student List (Page {{ students.page }} of {{ students.pages }})</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Student ID</th>
+            <th>Mark Attendance</th>
+            <th>Assign Grade</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for student in students.items %}
+        <tr>
+            <td>{{ student.username }}</td>
+            <td>{{ student.user_id }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('lecturer.mark_attendance', student_id=student.id) }}">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                    </select>
+                    <button class="btn btn-sm btn-success mt-1">Save</button>
+                </form>
+            </td>
+            <td>
+                <form method="POST" action="{{ url_for('lecturer.assign_grade', student_id=student.id) }}">
+                    <input type="text" name="exam_name" placeholder="Exam Name" class="form-control form-control-sm mb-1" required>
+                    <input type="number" step="0.01" name="score" placeholder="Score %" class="form-control form-control-sm mb-1" required>
+                    <input type="text" name="grade" placeholder="Grade (A+)" class="form-control form-control-sm mb-1" required>
+                    <button class="btn btn-sm btn-primary">Assign</button>
+                </form>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="4" class="text-center">No students found.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    {% if students.has_prev %}
+        <a class="btn btn-secondary" href="{{ url_for('lecturer.dashboard', page=students.prev_num) }}">Previous</a>
+    {% endif %}
+    {% if students.has_next %}
+        <a class="btn btn-secondary" href="{{ url_for('lecturer.dashboard', page=students.next_num) }}">Next</a>
+    {% endif %}
+</div>
+{% endblock %}
