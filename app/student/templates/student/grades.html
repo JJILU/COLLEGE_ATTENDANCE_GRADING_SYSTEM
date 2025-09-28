@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}My Grades{% endblock %}
+{% block content %}
+<h2>My Grades</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Exam</th>
+            <th>Score</th>
+            <th>Grade</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for g in grades %}
+        <tr>
+            <td>{{ g.exam_name }}</td>
+            <td>{{ g.score }}</td>
+            <td>{{ g.grade }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
