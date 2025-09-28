@@ -1,7 +1,7 @@
 import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity,set_access_cookies, set_refresh_cookies
 from app.extensions import db
 from app.models import User, Attendance, Grade, VALID_STUDENT_IDS
 from datetime import datetime
