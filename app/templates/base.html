@@ -11,13 +11,28 @@
             <a class="navbar-brand" href="#">College System</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/student/login">Student</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/lecturer/login">Lecturer</a></li>
+                    {% if current_user_role %}
+                        {% if current_user_role == 'lecturer' %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('lecturer.dashboard') }}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('lecturer.view_attendance') }}">Attendance</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('lecturer.view_grades') }}">Grades</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('lecturer.logout') }}">Logout</a></li>
+                        {% elif current_user_role == 'student' %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('student.dashboard') }}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('student_attendance') }}">My Attendance</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('student_grades') }}">My Grades</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('student.logout') }}">Logout</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('student.login') }}">Student Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('lecturer.login') }}">Lecturer Login</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+
     <div class="container mt-4">
         {% with messages = get_flashed_messages() %}
             {% if messages %}

@@ -88,10 +88,17 @@ def dashboard():
     identity_str = get_jwt_identity()
     identity = json.loads(identity_str)
     lecturer_id = identity["id"]
+    role = identity["role"]  # Pass this
 
     page = request.args.get('page', 1, type=int)
     students = User.query.filter_by(role="student").paginate(page=page, per_page=5)
-    return render_template("lecturer/dashboard.html", students=students)
+
+    return render_template(
+        "lecturer/dashboard.html",
+        students=students,
+        current_user_role=role  # <-- pass role
+    )
+
 
 
 # ---------- Mark Attendance ----------

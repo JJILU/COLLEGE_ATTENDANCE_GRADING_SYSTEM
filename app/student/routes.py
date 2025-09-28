@@ -5,6 +5,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from app.extensions import db
 from app.models import User, Attendance, Grade, VALID_STUDENT_IDS
 from datetime import datetime
+import json
 
 student_bp = Blueprint('student', __name__, template_folder='templates')
 
@@ -89,6 +90,7 @@ def dashboard():
     identity_str = get_jwt_identity()
     identity = json.loads(identity_str)
     student_id = identity["id"]
+    role = identity["role"]  # Pass this
 
     student = User.query.get(student_id)
     attendances = Attendance.query.filter_by(student_id=student.id).all()
@@ -98,8 +100,10 @@ def dashboard():
         "student/dashboard.html",
         student=student,
         attendances=attendances,
-        grades=grades
+        grades=grades,
+        current_user_role=role  # <-- pass role
     )
+
 
 
 @student_bp.route("/attendance")
