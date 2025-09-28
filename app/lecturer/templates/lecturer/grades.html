@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Grades Management{% endblock %}
+{% block content %}
+<h2>All Grades</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Student ID</th>
+            <th>Exam</th>
+            <th>Score</th>
+            <th>Grade</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for g in grades %}
+        <tr>
+            <td>{{ g.id }}</td>
+            <td>{{ g.student_id }}</td>
+            <td>{{ g.exam_name }}</td>
+            <td>{{ g.score }}</td>
+            <td>{{ g.grade }}</td>
+            <td>
+                <form action="{{ url_for('lecturer.update_grade', id=g.id) }}" method="POST">
+                    <input type="number" name="score" step="0.01" placeholder="Score" required>
+                    <input type="text" name="grade" placeholder="Grade" required>
+                    <button class="btn btn-sm btn-primary">Update</button>
+                </form>
+                <a href="{{ url_for('lecturer.delete_grade', id=g.id) }}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -100,3 +100,27 @@ def dashboard():
         attendances=attendances,
         grades=grades
     )
+
+
+@student_bp.route("/attendance")
+@jwt_required()
+def student_attendance():
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "student":
+        flash("Access denied!")
+        return redirect(url_for("lecturer.dashboard"))
+
+    attendances = Attendance.query.filter_by(student_id=identity["id"]).all()
+    return render_template("student/attendance.html", attendances=attendances)
+
+
+@student_bp.route("/grades")
+@jwt_required()
+def student_grades():
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "student":
+        flash("Access denied!")
+        return redirect(url_for("lecturer.dashboard"))
+
+    grades = Grade.query.filter_by(student_id=identity["id"]).all()
+    return render_template("student/grades.html", grades=grades)

@@ -131,3 +131,134 @@ def assign_grade(student_id):
     db.session.commit()
     flash("Grade saved successfully!")
     return redirect(url_for('lecturer.dashboard'))
+
+
+
+
+
+
+# ---------- Attendance ----------
+@lecturer_bp.route("/attendance")
+@jwt_required()
+def view_attendance():
+    identity = json.loads(get_jwt_identity())
+    # Only lecturers allowed
+    if identity["role"] != "lecturer":
+        flash("Access denied!")
+        return redirect(url_for("student.dashboard"))
+
+    attendances = Attendance.query.all()
+    return render_template("lecturer/attendance.html", attendances=attendances)
+
+
+@lecturer_bp.route("/attendance/add", methods=["POST"])
+@jwt_required()
+def add_attendance():
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "lecturer":
+        flash("Access denied!")
+        return redirect(url_for("student.dashboard"))
+
+    student_id = request.form.get("student_id")
+    status = request.form.get("status")
+    date = request.form.get("date")
+
+    new_att = Attendance(student_id=student_id, status=status, date=date)
+    db.session.add(new_att)
+    db.session.commit()
+    flash("Attendance added!")
+    return redirect(url_for("lecturer.view_attendance"))
+
+
+@lecturer_bp.route("/attendance/update/<int:id>", methods=["POST"])
+@jwt_required()
+def update_attendance(id):
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "lecturer":
+        flash("Access denied!")
+        return redirect(url_for("student.dashboard"))
+
+    attendance = Attendance.query.get(id)
+    attendance.status = request.form.get("status")
+    db.session.commit()
+    flash("Attendance updated!")
+    return redirect(url_for("lecturer.view_attendance"))
+
+
+@lecturer_bp.route("/attendance/delete/<int:id>")
+@jwt_required()
+def delete_attendance(id):
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "lecturer":
+        flash("Access denied!")
+        return redirect(url_for("student.dashboard"))
+
+    att = Attendance.query.get(id)
+    db.session.delete(att)
+    db.session.commit()
+    flash("Attendance deleted!")
+    return redirect(url_for("lecturer.view_attendance"))
+
+
+# ---------- Grades ----------
+@lecturer_bp.route("/grades")
+@jwt_required()
+def view_grades():
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "lecturer":
+        flash("Access denied!")
+        return redirect(url_for("student.dashboard"))
+
+    grades = Grade.query.all()
+    return render_template("lecturer/grades.html", grades=grades)
+
+
+@lecturer_bp.route("/grades/add", methods=["POST"])
+@jwt_required()
+def add_grade():
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "lecturer":
+        flash("Access denied!")
+        return redirect(url_for("student.dashboard"))
+
+    student_id = request.form.get("student_id")
+    exam_name = request.form.get("exam_name")
+    score = request.form.get("score")
+    grade_letter = request.form.get("grade")
+
+    new_grade = Grade(student_id=student_id, exam_name=exam_name, score=score, grade=grade_letter)
+    db.session.add(new_grade)
+    db.session.commit()
+    flash("Grade added!")
+    return redirect(url_for("lecturer.view_grades"))
+
+
+@lecturer_bp.route("/grades/update/<int:id>", methods=["POST"])
+@jwt_required()
+def update_grade(id):
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "lecturer":
+        flash("Access denied!")
+        return redirect(url_for("student.dashboard"))
+
+    grade = Grade.query.get(id)
+    grade.score = request.form.get("score")
+    grade.grade = request.form.get("grade")
+    db.session.commit()
+    flash("Grade updated!")
+    return redirect(url_for("lecturer.view_grades"))
+
+
+@lecturer_bp.route("/grades/delete/<int:id>")
+@jwt_required()
+def delete_grade(id):
+    identity = json.loads(get_jwt_identity())
+    if identity["role"] != "lecturer":
+        flash("Access denied!")
+        return redirect(url_for("student.dashboard"))
+
+    grade = Grade.query.get(id)
+    db.session.delete(grade)
+    db.session.commit()
+    flash("Grade deleted!")
+    return redirect(url_for("lecturer.view_grades"))

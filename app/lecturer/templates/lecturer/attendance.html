@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Attendance Management{% endblock %}
+{% block content %}
+<h2>All Attendance Records</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Student ID</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for att in attendances %}
+        <tr>
+            <td>{{ att.id }}</td>
+            <td>{{ att.student_id }}</td>
+            <td>{{ att.status }}</td>
+            <td>{{ att.date }}</td>
+            <td>
+                <form action="{{ url_for('lecturer.update_attendance', id=att.id) }}" method="POST">
+                    <select name="status">
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                    </select>
+                    <button class="btn btn-sm btn-primary">Update</button>
+                </form>
+                <a href="{{ url_for('lecturer.delete_attendance', id=att.id) }}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
